@@ -4,6 +4,7 @@ var bodyParser = require('body-parser');
 var errorhandler = require('errorhandler');
 var methodOverride = require('method-override');
 var uuid = require('node-uuid');
+var path = require('path');
 
 // ===== schema
 
@@ -114,6 +115,7 @@ var app = express();
 
 app.use(bodyParser());
 app.use(methodOverride());
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next){
 	console.log('%s [%s] %s', getNow(), req.method, req.url);
