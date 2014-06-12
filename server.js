@@ -14,17 +14,17 @@ mongoose.connect('mongodb://localhost/doj');
 var userSchema = new Schema({
 	username	: String,
 	password	: String,
-	email		: String
+	email	: String
 });
 
 var tokenSchema = new Schema({
 	token		: String,
-	user		: { type: Schema.Types.ObjectId, ref: 'User' },
+	user			: { type: Schema.Types.ObjectId, ref: 'User' },
 	createDate	: { type: String, default: Date.now }
 });
 
 var problemSchema = new Schema({
-	name		: String,
+	name			: String,
 	description	: String,
 	input		: String,
 	output		: String,
@@ -38,7 +38,7 @@ var submissionSchema = new Schema({
 	createDate	: { type: String, default: Date.now },
 	judgeStatus	: String,
 	message		: String,
-	submitter	: { type: Schema.Types.ObjectId, ref: 'User' }
+	submitter		: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 tokenSchema.methods.hasExpired = function(){
@@ -126,7 +126,25 @@ app.get('/api', function(req, res){
 	res.send('DOJ api is running');
 });
 
-app.post('/api/user/login', function(req, res){
+app.post('/api/user', function(req, res, next){
+	var user = new User({
+		username	: req.body.username,
+		password	: req.body.password,
+		email	: req.body.email
+	});
+	user.save(function(err, obj){
+		if(err) return next(err);
+		sendOk(res, {
+			message	: 'successfully saved',
+			username	: req.body.username,
+			password	: req.body.password,
+			email	: req.body.email,
+			id		: obj._id
+		});
+	});
+});
+
+app.post('/api/user/login', function(req, res, next){
 	console.log('POST /api/user/login ->');
 	console.log(req.body);
 	User.findOne({ username: req.body.username, password: req.body.password }, function(err, user){
@@ -138,14 +156,14 @@ app.post('/api/user/login', function(req, res){
 			tok.save(function(err){
 				sendOk(res, {
 					'userid'	: user._id,
-					'token'		: tokStr
+					'token'	: tokStr
 				});
 			});
 		}
 	});
 });
 
-app.get('/api/user/logout', isAuthGet, function(req, res){
+app.get('/api/user/logout', isAuthGet, function(req, res, next){
 	console.log('GET /api/user/logout ->');
 	console.log(req.query);
 	Token.findOne({ user: req.query.userid, token: req.query.token }, function(err, token){
@@ -159,9 +177,9 @@ app.get('/api/user/logout', isAuthGet, function(req, res){
 	});
 });
 
-app.post('/api/problem', isAuthPost, function(req, res){
+app.post('/api/problem', isAuthPost, function(req, res, next){
 	var prob = new Problem({
-		name		: req.body.name,
+		name			: req.body.name,
 		description	: req.body.description,
 		input		: req.body.input,
 		output		: req.body.output,
@@ -176,16 +194,16 @@ app.post('/api/problem', isAuthPost, function(req, res){
 	});
 });
 
-app.get('/api/problem/:id', function(req, res){
+app.get('/api/problem/:id', function(req, res, next){
 	Problem.findOne({ '_id': req.params.id }, function(err, prob){
 		if(err) return next(err);
 		if(prob === null){
 			sendError(res, 'problem not found');
 		} else {
 			sendOk(res, {
-				'name'			: prob.name,
+				'name'		: prob.name,
 				'description'	: prob.description,
-				'input'			: prob.input,
+				'input'		: prob.input,
 				'output'		: prob.output,
 				'createDate'	: prob.createDate,
 				'updateDate'	: prob.updateDate,
