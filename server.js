@@ -14,17 +14,18 @@ mongoose.connect('mongodb://localhost/doj');
 var userSchema = new Schema({
 	username	: String,
 	password	: String,
-	email	: String
+	email		: String,
+	role		: String
 });
 
 var tokenSchema = new Schema({
 	token		: String,
-	user			: { type: Schema.Types.ObjectId, ref: 'User' },
+	user		: { type: Schema.Types.ObjectId, ref: 'User' },
 	createDate	: { type: String, default: Date.now }
 });
 
 var problemSchema = new Schema({
-	name			: String,
+	name		: String,
 	description	: String,
 	input		: String,
 	output		: String,
@@ -38,7 +39,7 @@ var submissionSchema = new Schema({
 	createDate	: { type: String, default: Date.now },
 	judgeStatus	: String,
 	message		: String,
-	submitter		: { type: Schema.Types.ObjectId, ref: 'User' }
+	submitter	: { type: Schema.Types.ObjectId, ref: 'User' }
 });
 
 tokenSchema.methods.hasExpired = function(){
@@ -66,8 +67,9 @@ function collectObject(){
 	return ret;
 }
 
-function sendError(res, msg){
-	res.send({
+function sendError(res, msg, code){
+	code = typeof code !== 'undefined' ? code : 500;
+	res.status(code).send({
 		'status'	: 'error',
 		'message'	: msg
 	});
@@ -80,7 +82,11 @@ function sendOk(res, payload){
 }
 
 function sendUnauth(res){
-	sendError(res, 'sorry, you are not authorized.');
+	sendError(res, 'sorry, you are not authorized.', 401);
+}
+
+function sendForbidden(res){
+	sendError(res, 'sorry, but you don\'t have the permission.', 403);
 }
 
 function getNow(){
@@ -98,12 +104,32 @@ function isAuthGet(req, res, success){
 	});
 }
 
+function isAdminGet(req, res, success){
+	Token.findOne({ user: req.query.userid, token: req.query.token }).populate('user').exec(function(err, token){
+		if(token.user.role !== 'admin'){
+			sendForbidden(res);
+		} else {
+			return success();
+		}
+	});
+}
+
 function isAuthPost(req, res, success){
 	Token.findOne({ user: req.body.userid, token: req.body.token }, function(err, token){
 		if(token === null){
 			sendUnauth(res);
 		} else {
 			req['userid'] = token.user;
+			return success();
+		}
+	});
+}
+
+function isAdminPost(req, res, success){
+	Token.findOne({ user: req.body.userid, token: req.body.token }).populate('user').exec(function(err, token){
+		if(token.user.role !== 'admin'){
+			sendForbidden(res);
+		} else {
 			return success();
 		}
 	});
@@ -136,26 +162,43 @@ app.post('/api/user', function(req, res, next){
 		if(err) return next(err);
 		sendOk(res, {
 			message	: 'successfully saved',
-			username	: req.body.username,
-			password	: req.body.password,
-			email	: req.body.email,
-			id		: obj._id
+			user	: {
+				username	: req.body.username,
+				password	: req.body.password,
+				email		: req.body.email,
+				id			: obj._id
+			}
 		});
 	});
 });
 
-app.post('/api/user/login', function(req, res, next){
-	console.log('POST /api/user/login ->');
+app.post('/api/user/:id', function(req, res, next){
+	User.findOne({ '_id': req.params.id }, function(err, user){
+		if(err) return next(err);
+		if(user === null){
+			sendError(res, 'user not found');
+		} else {
+			sendOk(res, { user: {
+				'username'	: user.username,
+				'email'		: user.email,
+				'role'		: user.role
+			}});
+		}
+	});
+});
+
+app.post('/api/login', function(req, res, next){
+	console.log('POST /api/login ->');
 	console.log(req.body);
 	User.findOne({ username: req.body.username, password: req.body.password }, function(err, user){
 		if(user === null){
-			sendError(res, 'user not found');
+			sendError(res, 'user not found', 401);
 		} else {
 			var tokStr = uuid.v4();
 			var tok = new Token({ token: tokStr, user: user._id });
 			tok.save(function(err){
 				sendOk(res, {
-					'userid'	: user._id,
+					'userid': user._id,
 					'token'	: tokStr
 				});
 			});
@@ -163,8 +206,8 @@ app.post('/api/user/login', function(req, res, next){
 	});
 });
 
-app.get('/api/user/logout', isAuthGet, function(req, res, next){
-	console.log('GET /api/user/logout ->');
+app.get('/api/logout', isAuthGet, function(req, res, next){
+	console.log('GET /api/logout ->');
 	console.log(req.query);
 	Token.findOne({ user: req.query.userid, token: req.query.token }, function(err, token){
 		if(err) return next(err);
@@ -177,9 +220,9 @@ app.get('/api/user/logout', isAuthGet, function(req, res, next){
 	});
 });
 
-app.post('/api/problem', isAuthPost, function(req, res, next){
+app.post('/api/problem', isAuthPost, isAdminPost, function(req, res, next){
 	var prob = new Problem({
-		name			: req.body.name,
+		name		: req.body.name,
 		description	: req.body.description,
 		input		: req.body.input,
 		output		: req.body.output,
@@ -200,15 +243,15 @@ app.get('/api/problem/:id', function(req, res, next){
 		if(prob === null){
 			sendError(res, 'problem not found');
 		} else {
-			sendOk(res, {
-				'name'		: prob.name,
+			sendOk(res, { problem: {
+				'name'			: prob.name,
 				'description'	: prob.description,
-				'input'		: prob.input,
+				'input'			: prob.input,
 				'output'		: prob.output,
 				'createDate'	: prob.createDate,
 				'updateDate'	: prob.updateDate,
 				'author'		: prob.author
-			});
+			}});
 		}
 	});
 });
