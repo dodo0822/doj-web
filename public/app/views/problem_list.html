@@ -1,0 +1,17 @@
+<div ng-init="init()">
+	<h1>Problem List</h1>
+	<button ng-if="isAdmin" ng-click="go('/problem/add')" type="button" class="btn btn-primary">Add a problem</button>
+	<table class="table table-strip problem-list">
+		<thead>
+			<tr>
+				<th width="15%">Status</th>
+				<th>Title</th>
+			</tr>
+		</thead>
+		<tbody ng-if="problems.length === 0">
+			<tr>
+				<td colspan="2">There is no problem to display at this moment.</td>
+			</tr>
+		</tbody>
+	</table>
+</div>

@@ -1,4 +1,4 @@
-var dojApp = angular.module('dojApp', ['ngRoute', 'dojApp.controllers']);
+var dojApp = angular.module('dojApp', ['ngRoute', 'dojApp.controllers', 'dojApp.services', 'dojApp.directives']);
 
 dojApp.config(['$routeProvider', function($routeProvider){
 
@@ -10,6 +10,14 @@ dojApp.config(['$routeProvider', function($routeProvider){
 		when('/login', {
 			templateUrl: 'app/views/login.html',
 			controller: 'LoginController'
+		}).
+		when('/problem', {
+			templateUrl: 'app/views/problem_list.html',
+			controller: 'ProblemListController'
+		}).
+		when('/problem/add', {
+			templateUrl: 'app/views/problem_add.html',
+			controller: 'ProblemAddController'
 		}).
 		otherwise({
 			redirectTo: '/home'
@@ -27,51 +35,4 @@ dojApp.constant('USER_ROLES', {
 	all: '*',
 	admin: 'admin',
 	user: 'user'
-});
-
-dojApp.service('Session', function(){
-	
-	this.create = function(token, userid){
-		console.log('session created');
-		this.token = token;
-		this.userid = userid;
-	};
-	
-	this.destroy = function(){
-		this.token = null;
-		this.userid = null;
-	};
-	
-	return this;
-	
-});
-
-dojApp.factory('AuthService', function($http, Session){
-	return {
-		
-		login: function(credentials){
-			return $http.post('/api/login', credentials).then(function(resp){
-				Session.create(resp.data.token, resp.data.userid, 'admin');
-			});
-		},
-		
-		logout: function(){
-			Session.destroy();
-		},
-		
-		isAuthenticated: function(){
-			return !!Session.userid;
-		}
-		
-	};
-});
-
-dojApp.factory('UserService', function($http){
-	return {
-		
-		getUser: function(id){
-			return $http.post('/api/user/' + id);
-		}
-		
-	};
 });

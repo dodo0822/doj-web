@@ -156,7 +156,7 @@ app.post('/api/user', function(req, res, next){
 	var user = new User({
 		username	: req.body.username,
 		password	: req.body.password,
-		email	: req.body.email
+		email		: req.body.email
 	});
 	user.save(function(err, obj){
 		if(err) return next(err);
@@ -234,6 +234,14 @@ app.post('/api/problem', isAuthPost, isAdminPost, function(req, res, next){
 			'message': 'successfully saved',
 			'id': obj._id
 		});
+	});
+});
+
+app.get('/api/problem', function(req, res, next){
+	Problem.find(function(err, prob){
+		if(err) return next(err);
+		sendOk(res, {problems: prob});
+		console.log(prob);
 	});
 });
 
