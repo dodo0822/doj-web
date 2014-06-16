@@ -15,7 +15,7 @@ var userSchema = new Schema({
 	username	: String,
 	password	: String,
 	email		: String,
-	role		: String
+	role		: { type: String, default: 'user' }
 });
 
 var tokenSchema = new Schema({
