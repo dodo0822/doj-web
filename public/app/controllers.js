@@ -55,7 +55,7 @@ angular.module('dojApp.controllers').controller('HomeController', function($scop
 	$scope.message = 'Welcome to DOJ!';
 });
 
-angular.module('dojApp.controllers').controller('ProblemListController', function($scope, ProblemService){
+angular.module('dojApp.controllers').controller('ProblemListController', function($scope, ProblemService, $location){
 	
 	$scope.problems = [];
 	
@@ -65,10 +65,80 @@ angular.module('dojApp.controllers').controller('ProblemListController', functio
 		});
 	};
 	
+	$scope.view = function(id){
+		$location.path('/problem/view/' + id);
+	};
+	
 });
 
-angular.module('dojApp.controllers').controller('ProblemAddController', function($scope){
-	$scope.message = 'Welcome to DOJ!';
+angular.module('dojApp.controllers').controller('ProblemViewController', function($scope, ProblemService, $routeParams, $location){
+	
+	$scope.problem = {
+		name: '',
+		description: '',
+		input: '',
+		output: '',
+		createDate: '',
+		updateDate: '',
+		author: ''
+	};
+	
+	$scope.init = function(){
+		ProblemService.getProblem($routeParams.id).then(function(resp){
+			$scope.problem = resp.data.problem;
+		}, function(resp){
+			console.log(resp);
+		});
+	};
+    
+    $scope.solve = function(){
+        $location.path('/problem/solve/' + $routeParams.id);
+    };
+	
+});
+
+angular.module('dojApp.controllers').controller('ProblemSolveController', function($scope, ProblemService, growlNotifications, $location, $routeParams){
+    $scope.submission = {
+        problem: '',
+        code: ''
+    };
+    
+    $scope.problem = {
+		name: '',
+		description: '',
+		input: '',
+		output: '',
+		createDate: '',
+		updateDate: '',
+		author: ''
+	};
+    
+    $scope.init = function(){
+        ProblemService.getProblem($routeParams.id).then(function(resp){
+            $scope.problem = resp.data.problem;
+        }, function(resp){
+            console.log(resp); 
+        });
+    }
+});
+
+angular.module('dojApp.controllers').controller('ProblemAddController', function($scope, ProblemService, growlNotifications, $location){
+	$scope.problem = {
+		name: '',
+		description: '',
+		input: '',
+		output: ''
+	};
+	
+	$scope.submit = function(problem){
+		ProblemService.addProblem(problem).then(function(resp){
+			var id = resp.data.id;
+			growlNotifications.add('Successfully saved problem with id: ' + id);
+			$location.path('/problem/view/' + id);
+		}, function(resp){
+			console.log(resp);
+		});
+	};
 });
 
 angular.module('dojApp.controllers').controller('LoginController', function($scope, $rootScope, AUTH_EVENTS, AuthService, $location){

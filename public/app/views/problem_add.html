@@ -1,1 +1,32 @@
 <h1>Add a problem</h1>
+<div class="row">
+	<div class="col-md-6">
+		<form role="form" ng-submit="submit(problem)">
+			<div class="form-group">
+				<label for="problemTitle">
+					Name:
+				</label>
+				<input type="text" id="problemTitle" ng-model="problem.name" class="form-control" placeholder="Enter name">
+			</div>
+			<div class="form-group">
+				<label for="problemDescription">
+					Description (HTML code):
+				</label>
+				<textarea id="problemDescription" ng-model="problem.description" class="form-control" rows="10" placeholder="Enter description (HTML is supported)"></textarea>
+			</div>
+			<div class="form-group">
+				<label for="problemInput">
+					Sample Input:
+				</label>
+				<textarea id="problemInput" ng-model="problem.input" class="form-control" rows="10" placeholder="Enter input"></textarea>
+			</div>
+			<div class="form-group">
+				<label for="problemOutput">
+					Sample Output:
+				</label>
+				<textarea id="problemOutput" ng-model="problem.output" class="form-control" rows="10" placeholder="Enter output"></textarea>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form>
+	</div>
+</div>

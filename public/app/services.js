@@ -32,6 +32,12 @@ angular.module('dojApp.services').factory('AuthService', function($http, Session
 		
 		isAuthenticated: function(){
 			return !!Session.userid;
+		},
+		
+		appendCredentials: function(obj){
+			obj['token'] = Session.token;
+			obj['userid'] = Session.userid;
+			return obj;
 		}
 		
 	};
@@ -41,17 +47,25 @@ angular.module('dojApp.services').factory('UserService', function($http){
 	return {
 		
 		getUser: function(id){
-			return $http.post('/api/user/' + id);
+			return $http.get('/api/user/' + id);
 		}
 		
 	};
 });
 
-angular.module('dojApp.services').factory('ProblemService', function($http){
+angular.module('dojApp.services').factory('ProblemService', function($http, AuthService){
 	return {
 	
 		getProblemList: function(){
 			return $http.get('/api/problem');
+		},
+		
+		getProblem: function(id){
+			return $http.get('/api/problem/' + id);
+		},
+		
+		addProblem: function(problem){
+			return $http.post('/api/problem', AuthService.appendCredentials(problem));
 		}
 	
 	};

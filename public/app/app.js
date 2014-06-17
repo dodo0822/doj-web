@@ -1,4 +1,4 @@
-var dojApp = angular.module('dojApp', ['ngRoute', 'dojApp.controllers', 'dojApp.services', 'dojApp.directives']);
+var dojApp = angular.module('dojApp', ['ngRoute', 'dojApp.controllers', 'dojApp.services', 'dojApp.directives', 'ui.codemirror']);
 
 dojApp.config(['$routeProvider', function($routeProvider){
 
@@ -15,9 +15,17 @@ dojApp.config(['$routeProvider', function($routeProvider){
 			templateUrl: 'app/views/problem_list.html',
 			controller: 'ProblemListController'
 		}).
+		when('/problem/view/:id', {
+			templateUrl: 'app/views/problem_view.html',
+			controller: 'ProblemViewController'
+		}).
 		when('/problem/add', {
 			templateUrl: 'app/views/problem_add.html',
 			controller: 'ProblemAddController'
+		}).
+		when('/problem/solve/:id', {
+			templateUrl: 'app/views/problem_solve.html',
+			controller: 'ProblemSolveController'
 		}).
 		otherwise({
 			redirectTo: '/home'

@@ -172,7 +172,7 @@ app.post('/api/user', function(req, res, next){
 	});
 });
 
-app.post('/api/user/:id', function(req, res, next){
+app.get('/api/user/:id', function(req, res, next){
 	User.findOne({ '_id': req.params.id }, function(err, user){
 		if(err) return next(err);
 		if(user === null){
@@ -240,13 +240,21 @@ app.post('/api/problem', isAuthPost, isAdminPost, function(req, res, next){
 app.get('/api/problem', function(req, res, next){
 	Problem.find(function(err, prob){
 		if(err) return next(err);
-		sendOk(res, {problems: prob});
-		console.log(prob);
+		var problems = [];
+		prob.forEach(function(problem){
+			var p = {
+				name	: problem.name,
+				author	: problem.author,
+				id		: problem._id
+			};
+			problems.push(p);
+		});
+		sendOk(res, {problems: problems});
 	});
 });
 
 app.get('/api/problem/:id', function(req, res, next){
-	Problem.findOne({ '_id': req.params.id }, function(err, prob){
+	Problem.findOne({ '_id': req.params.id }).populate('author').exec(function(err, prob){
 		if(err) return next(err);
 		if(prob === null){
 			sendError(res, 'problem not found');

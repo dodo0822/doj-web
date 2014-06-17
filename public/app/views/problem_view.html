@@ -1,0 +1,16 @@
+<div ng-init="init()">
+<h1>Details :: {{ problem.name }}</h1>
+<h3>Description</h3>
+<div ng-bind-html="problem.description"></div>
+<h3>Sample Input</h3>
+<pre>
+{{ problem.input }}
+</pre>
+<h3>Sample Output</h3>
+<pre>
+{{ problem.output }}
+</pre>
+<h3>Problem Setter</h3>
+<p>{{ problem.author.username }}</p>
+<button ng-if="loggedIn" class="btn btn-primary" ng-click="solve()">Solve this problem</button>
+</div>

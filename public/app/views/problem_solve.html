@@ -1,0 +1,20 @@
+<div ng-init="init()">
+    <h1>Solve :: {{ problem.name }}</h1>
+    <form role="form" ng-submit="submit(submission)">
+        <p><strong>Description:</strong></p>
+        <div ng-bind-html="problem.description"></div>
+        <div class="form-group">
+            <label for="submissionCode">
+                C++ Code:
+            </label>
+            <textarea id="submissionCode" ui-codemirror="{
+                                                         lineNumbers: true,
+                                                         theme:'twilight',
+                                                         lineWrapping : true,
+                                                         matchBrackets: true,
+                                                         mode: 'text/x-c++src'}"
+                      ng-model="submission.code" rows="10" placeholder="Enter your code here"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>

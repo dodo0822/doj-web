@@ -7,6 +7,8 @@
 		<title>DOJ</title>
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 		<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.2.0/codemirror.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.2.0/theme/twilight.css">
 		<link rel="stylesheet" href="/app/style.css">
 	</head>
 	<body ng-controller="ApplicationController" ng-init="init()">
@@ -45,6 +47,9 @@
 		</div>
 		
 		<script src="/app/vendor/pace.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.2.0/codemirror.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.2.0/addon/edit/matchbrackets.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/4.2.0/mode/clike/clike.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular.min.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular-route.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.17/angular-sanitize.js"></script>
@@ -52,6 +57,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 		<script src="/app/vendor/growl-notifications.min.js"></script>
+        <script src="/app/vendor/ui-codemirror.min.js"></script>
 		<script src="/app/controllers.js"></script>
 		<script src="/app/services.js"></script>
 		<script src="/app/directives.js"></script>
