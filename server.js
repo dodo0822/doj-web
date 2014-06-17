@@ -15,7 +15,7 @@ var userSchema = new Schema({
 	username	: String,
 	password	: String,
 	email		: String,
-	role		: String
+	role		: { type: String, default: 'user' }
 });
 
 var tokenSchema = new Schema({
@@ -188,8 +188,6 @@ app.get('/api/user/:id', function(req, res, next){
 });
 
 app.post('/api/login', function(req, res, next){
-	console.log('POST /api/login ->');
-	console.log(req.body);
 	User.findOne({ username: req.body.username, password: req.body.password }, function(err, user){
 		if(user === null){
 			sendError(res, 'user not found', 401);
@@ -207,8 +205,6 @@ app.post('/api/login', function(req, res, next){
 });
 
 app.get('/api/logout', isAuthGet, function(req, res, next){
-	console.log('GET /api/logout ->');
-	console.log(req.query);
 	Token.findOne({ user: req.query.userid, token: req.query.token }, function(err, token){
 		if(err) return next(err);
 		token.remove(function(err){
